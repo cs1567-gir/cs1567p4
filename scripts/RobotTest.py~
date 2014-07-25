@@ -14,6 +14,7 @@ class RobotTest(object):
         self.name = name        
         self.bump_sub = rospy.Subscriber('/mobile_base/events/bumper', BumperEvent, self.on_bump)
         self.bump_pub = rospy.Publisher('/robots/bumps', Bump, queue_size=10)
+        rospy.wait_for_service('potential_field')
         self.potential = rospy.ServiceProxy('potential_field', PotentialField)
 
     def on_bump(self, msg):
