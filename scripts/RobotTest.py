@@ -20,12 +20,14 @@ class RobotTest(object):
     def on_bump(self, msg):
         if msg.state is BumperEvent.PRESSED:
             self.bump_pub.publish(self.id)
-            rospy.loginfo('bump in robot')
+            rospy.loginfo('{} has bumped.'.format(self.id))
 
     def run(self):
         while not rospy.is_shutdown():
-            resp = self.potential(self.id)
-            #rospy.loginfo("x: {} y: {}".format(resp.x, resp.y))
+            potential = self.potential(self.id).potential
+            # todo: act on potential
+            rospy.loginfo("potential - x: {} y: {}".format(potential[0], potential[1]))
+            rospy.sleep(0.1)
 
 if __name__ == "__main__":
     r = RobotTest(0, 'rosie')
