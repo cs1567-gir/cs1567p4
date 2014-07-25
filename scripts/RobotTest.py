@@ -7,20 +7,23 @@ from cs1567p4.msg import *
 from cs1567p4.srv import *
 
 class RobotTest(object):
-    def __init__(self, id, name):
+    def __init__(self):
         super(RobotTest, self).__init__()
         rospy.init_node('RobotTest', anonymous=True)
-        self.id = 0
-        self.name = name        
-        self.bump_sub = rospy.Subscriber('/rosie_base/events/bumper', BumperEvent, self.on_bump)
+        
+        self.id = rospy.get_param('~robot_id')
+        self.name = rospy.get_param('~robot_name')
+
+        self.bump_sub = rospy.Subscriber('/' + self.name + '_base/events/bumper', BumperEvent, self.on_bump)
         self.bump_pub = rospy.Publisher('/robots/bumps', Bump, queue_size=10)
+        
         rospy.wait_for_service('potential_field')
         self.potential = rospy.ServiceProxy('potential_field', PotentialField)
 
     def on_bump(self, msg):
         if msg.state is BumperEvent.PRESSED:
             self.bump_pub.publish(self.id)
-            rospy.loginfo('{} has bumped.'.format(self.id))
+            rospy.loginfo('{} has bumped.'.format(self.name))
 
     def run(self):
         while not rospy.is_shutdown():
@@ -30,5 +33,5 @@ class RobotTest(object):
             rospy.sleep(0.1)
 
 if __name__ == "__main__":
-    r = RobotTest(0, 'rosie')
+    r = RobotTest()
     r.run()
