@@ -6,7 +6,7 @@ import rospy
 import numpy
 import sensor_msgs.point_cloud2 as pc2
 from sensor_msgs.msg import *
-from cs1567p2.msg import *
+from cs1567p4.msg import *
 
 class RobotLocation():
     def __init__(self, color):
@@ -173,6 +173,7 @@ def update_robots(camera):
     for robot in robots:
         locations.append(robot.location)
     locpub.publish(locations)
+    rospy.loginfo('location list published.')
 
 
 ########  INITIALIZATION ########################################
@@ -185,8 +186,8 @@ def initialize():
     for i in range(len(color_mask_list)-1):
         robots.append(RobotLocation(i))
 
-    rospy.init_node("gort_localize")
-    locpub = rospy.Publisher("/gort/location",LocationList) #publish your locations
+    rospy.init_node("robot_localize")
+    locpub = rospy.Publisher("/robots/location",LocationList) #publish your locations
     pubs.append(rospy.Publisher("/gort/mask1",Image))
     pubs.append(rospy.Publisher("/gort/mask2",Image))
     pubs.append(rospy.Publisher("/gort/mask3",Image))

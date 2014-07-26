@@ -16,22 +16,37 @@ class RobotTest(object):
 
         self.bump_sub = rospy.Subscriber('/' + self.name + '_base/events/bumper', BumperEvent, self.on_bump)
         self.bump_pub = rospy.Publisher('/robots/bumps', Bump, queue_size=10)
+        self.odom_pub = rospy.Publisher('/' + self.name + '_base/commands/velocity', Twist, queue_size=10)
         
         rospy.wait_for_service('potential_field')
         self.potential = rospy.ServiceProxy('potential_field', PotentialField)
+
+        self.loc_sub = rospy.Subscriber('/robots/location', LocationList, self.update_location)
+
+    def update_location(self, msg):
+        print('received new location.')
+        for location in msg.robots:
+            if location.robot_num is self.id:
+                self.location = location
+                break
+        self.update_potential()
+        
 
     def on_bump(self, msg):
         if msg.state is BumperEvent.PRESSED:
             self.bump_pub.publish(self.id)
             rospy.loginfo('{} has bumped.'.format(self.name))
 
-    def run(self):
-        while not rospy.is_shutdown():
-            potential = self.potential(self.id).potential
-            # todo: act on potential
-            rospy.loginfo("potential - x: {} y: {}".format(potential[0], potential[1]))
-            rospy.sleep(0.1)
+    def update_potential(self):
+        potential = self.potential(self.id).potential
+        #rospy.loginfo("potential - x: {} y: {}".format(potential[0], potential[1]))
+        self.act(potential)
+
+    def act(self,potential):
+        twist = Twist()
+        twist.linear.x = potential[0]
+        self.odom_pub.publish(twist)
 
 if __name__ == "__main__":
     r = RobotTest()
-    r.run()
+    rospy.spin()
