@@ -1,5 +1,5 @@
 <launch>    
-    <node name="RobotTest" pkg="cs1567p4" type="RobotTest.py" output="screen">
+    <node name="$(anon robot)" pkg="cs1567p4" type="RobotTest.py" output="screen">
         <rosparam file="$(find cs1567p4)/param/robot.yaml"/>
     </node>
 </launch>
