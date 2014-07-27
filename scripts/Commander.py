@@ -5,6 +5,8 @@ from nav_msgs.msg import *
 from geometry_msgs.msg import *
 from cs1567p4.msg import *
 from cs1567p4.srv import *
+import numpy
+import math
 
 # coordinates the robots, handles state transitions 
 class Commander(object):
@@ -68,7 +70,7 @@ class Robot(object):
         dx = self.getX() - other.getX()
         dy = self.getY() - other.getY()
         r = numpy.array([dx, dy])
-        r_hat = r/numpy.linalg.norm(direction)
+        r_hat = r/numpy.linalg.norm(r)
         force = 1/numpy.linalg.norm(r)**2
         force_vector = force*r_hat
         if self.status == self.ZOMBIE and robot.status == self.HUMAN:
