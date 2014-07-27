@@ -5,6 +5,7 @@ from geometry_msgs.msg import *
 from kobuki_msgs.msg import BumperEvent
 from cs1567p4.msg import *
 from cs1567p4.srv import *
+import numpy
 
 class RobotTest(object):
     def __init__(self):
@@ -24,7 +25,7 @@ class RobotTest(object):
         self.loc_sub = rospy.Subscriber('/robots/location', LocationList, self.update_location)
 
     def update_location(self, msg):
-        print('received new location.')
+        #print('received new location.')
         for location in msg.robots:
             if location.robot_num is self.id:
                 self.location = location
@@ -39,7 +40,7 @@ class RobotTest(object):
 
     def update_potential(self):
         potential = self.potential(self.id).potential
-        #rospy.loginfo("potential - x: {} y: {}".format(potential[0], potential[1]))
+        rospy.loginfo("potential - x: {} y: {}".format(potential[0], potential[1]))
         self.act(potential)
 
     def act(self,potential):

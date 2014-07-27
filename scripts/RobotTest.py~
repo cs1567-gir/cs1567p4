@@ -7,26 +7,46 @@ from cs1567p4.msg import *
 from cs1567p4.srv import *
 
 class RobotTest(object):
-    def __init__(self, id, name):
+    def __init__(self):
         super(RobotTest, self).__init__()
         rospy.init_node('RobotTest', anonymous=True)
-        self.id = 0
-        self.name = name        
-        self.bump_sub = rospy.Subscriber('/mobile_base/events/bumper', BumperEvent, self.on_bump)
+        
+        self.id = rospy.get_param('~robot_id')
+        self.name = rospy.get_param('~robot_name')
+
+        self.bump_sub = rospy.Subscriber('/' + self.name + '_base/events/bumper', BumperEvent, self.on_bump)
         self.bump_pub = rospy.Publisher('/robots/bumps', Bump, queue_size=10)
+        self.odom_pub = rospy.Publisher('/' + self.name + '_base/commands/velocity', Twist, queue_size=10)
+        
         rospy.wait_for_service('potential_field')
         self.potential = rospy.ServiceProxy('potential_field', PotentialField)
+
+        self.loc_sub = rospy.Subscriber('/robots/location', LocationList, self.update_location)
+
+    def update_location(self, msg):
+        print('received new location.')
+        for location in msg.robots:
+            if location.robot_num is self.id:
+                self.location = location
+                break
+        self.update_potential()
+        
 
     def on_bump(self, msg):
         if msg.state is BumperEvent.PRESSED:
             self.bump_pub.publish(self.id)
-            rospy.loginfo('bump in robot')
+            rospy.loginfo('{} has bumped.'.format(self.name))
 
-    def run(self):
-        while not rospy.is_shutdown():
-            resp = self.potential(self.id)
-            #rospy.loginfo("x: {} y: {}".format(resp.x, resp.y))
+    def update_potential(self):
+        potential = self.potential(self.id).potential
+        #rospy.loginfo("potential - x: {} y: {}".format(potential[0], potential[1]))
+        self.act(potential)
+
+    def act(self,potential):
+        twist = Twist()
+        twist.linear.x = potential[0]
+        self.odom_pub.publish(twist)
 
 if __name__ == "__main__":
-    r = RobotTest(0, 'rosie')
-    r.run()
+    r = RobotTest()
+    rospy.spin()
