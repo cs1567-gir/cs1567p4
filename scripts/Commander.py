@@ -55,6 +55,12 @@ class Robot(object):
         if self.status is ZOMBIE and other.status is HUMAN:
             other.status = ZOMBIE
 
+    def getX(self):
+        return self.location.x
+        
+    def getY(self):
+        return self.location.y
+
     def get_potential(self, other):
         # same robot, no repulsion
         if self is other:
