@@ -55,14 +55,6 @@ class Robot(object):
         if self.status is ZOMBIE and other.status is HUMAN:
             other.status = ZOMBIE
 
-    def get_potential(self):
-        potential_vector = numpy.array([0,0])
-        if other.ID is self.ID:
-            continue
-        potential_vector=numpy.add(potential_vector, force_vector)
-        normal_potential = potential_vector/numpy.linalg.norm(potential_vector)
-
-
     def get_potential(self, other):
         # same robot, no repulsion
         if self is other:
