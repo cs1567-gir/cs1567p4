@@ -1,4 +1,7 @@
-<launch>    
+<launch>   
+    <node name="$(anon constantcommand)" pkg="cs1567p4" type="ConstantCommand.py" output="screen">
+        <rosparam file="$(find cs1567p4)/param/robot.yaml"/>
+    </node> 
     <node name="$(anon robot)" pkg="cs1567p4" type="RobotTest.py" output="screen">
         <rosparam file="$(find cs1567p4)/param/robot.yaml"/>
     </node>

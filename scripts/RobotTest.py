@@ -5,6 +5,7 @@ from geometry_msgs.msg import *
 from kobuki_msgs.msg import BumperEvent
 from cs1567p4.msg import *
 from cs1567p4.srv import *
+import math
 import numpy
 
 class RobotTest(object):
@@ -17,10 +18,12 @@ class RobotTest(object):
 
         self.bump_sub = rospy.Subscriber('/' + self.name + '_base/events/bumper', BumperEvent, self.on_bump)
         self.bump_pub = rospy.Publisher('/robots/bumps', Bump, queue_size=10)
-        self.odom_pub = rospy.Publisher('/' + self.name + '_base/commands/velocity', Twist, queue_size=10)
-        
+
         rospy.wait_for_service('potential_field')
         self.potential = rospy.ServiceProxy('potential_field', PotentialField)
+
+        rospy.wait_for_service('constant_command_' + self.name)
+        self.const_cmd = rospy.ServiceProxy('constant_command_' + self.name, ConstantCommand)
 
         self.loc_sub = rospy.Subscriber('/robots/location', LocationList, self.update_location)
 
@@ -45,8 +48,28 @@ class RobotTest(object):
 
     def act(self,potential):
         twist = Twist()
-        twist.linear.x = potential[0]
-        self.odom_pub.publish(twist)
+        twist.linear.x = .2
+        epsilon = 1E-3
+
+        wanted_angle = math.atan2(potential[1], potential[0])
+        curr_angle = self.location.theta
+
+        diff_angle = wanted_angle - curr_angle
+
+        if diff_angle > math.pi:
+            diff_angle -= 2*math.pi
+        if diff_angle < -math.pi:
+            diff_angle += 2*math.pi
+
+        print 'diff_angle: {}'.format(diff_angle)
+
+        if math.fabs(diff_angle) > epsilon:
+            twist.linear.x *= (math.fabs(diff_angle - math.pi) / math.pi)
+            twist.angular.z = 0.1
+            if diff_angle < 0:
+                twist.angular.z *= -1
+            
+        self.const_cmd(twist)
 
 if __name__ == "__main__":
     r = RobotTest()
