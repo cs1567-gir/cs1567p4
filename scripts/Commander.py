@@ -13,7 +13,7 @@ class Commander(object):
     def __init__(self):
         super(Commander, self).__init__()
         # array of robot data
-        self.robots = [Robot(Robot.HUMAN), Robot(Robot.HUMAN), Robot(Robot.HUMAN)]
+        self.robots = [Robot(Robot.HUMAN), Robot(Robot.HUMAN), Robot(Robot.ZOMBIE)]
         rospy.init_node('Commander', anonymous=True)
         rospy.Service('potential_field', PotentialField, self.calc_potential)
         rospy.Subscriber('/robots/location', LocationList, self.cache_locations)
@@ -72,9 +72,9 @@ class Robot(object):
         r = numpy.array([dx, dy])
         r_hat = r/numpy.linalg.norm(r)
         force = 1/numpy.linalg.norm(r)**2
-        force_vector = force*r_hat
-        if self.status == self.ZOMBIE and robot.status == self.HUMAN:
+        if self.status == self.ZOMBIE and other.status == self.HUMAN:
             force = -1*force                    #By default, this vector will repel. But zombies must pursue humans.
+        force_vector = force*r_hat
         if self.status == other.status:
             pass                                #Consider scaling down the effect of like-robots
         return (force_vector[0], force_vector[1])
