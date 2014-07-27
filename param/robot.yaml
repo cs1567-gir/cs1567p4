@@ -1,0 +1,5 @@
+# replace 'rosie' with your robot name ('rosie', 'gort', 'gir')
+robot_name: 'rosie'
+# replace 1 with your id (0, 1, 2)
+robot_id: 1
+
