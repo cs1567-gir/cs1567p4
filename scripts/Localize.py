@@ -128,11 +128,7 @@ def get_heading(base_x, base_y, point_x, point_y):
     distance = get_distance(base_x, base_y, point_x, point_y)
     theta = 0.0
     if distance != 0:
-        theta = math.degrees(math.asin((point_y - base_y)/distance))
-        if point_x < base_x:
-            theta = math.degrees(math.acos((point_x - base_x)/distance))
-            if point_y < base_y:
-                theta = 360.0 - theta
+        theta = math.atan2((point_y - base_y), (point_x - base_x))
     return theta
 
 def pixels_to_real_offset(x, y):
