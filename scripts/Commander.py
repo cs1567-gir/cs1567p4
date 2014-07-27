@@ -13,7 +13,7 @@ class Commander(object):
     def __init__(self):
         super(Commander, self).__init__()
         # array of robot data
-        self.robots = [Robot(Robot.HUMAN), Robot(Robot.HUMAN), Robot(Robot.ZOMBIE)]
+        self.robots = [Robot(Robot.HUMAN), Robot(Robot.ZOMBIE), Robot(Robot.HUMAN)]
         rospy.init_node('Commander', anonymous=True)
         rospy.Service('potential_field', PotentialField, self.calc_potential)
         rospy.Subscriber('/robots/location', LocationList, self.cache_locations)
@@ -37,6 +37,12 @@ class Commander(object):
     def handle_bump(self, msg):
         robot = self.robots[msg.robotID]
         rospy.loginfo('Bump: ' + str(msg.robotID))
+        other = reduce(lambda x, y: x if robot.distance_to(x) < robot.distance_to(y) else y, 
+                       filter(lambda x: x is not robot, self.robots))
+
+        if other is not None:
+            robot.collide(other)
+        
         # handle bump
 
     def cache_locations(self, msg):
@@ -54,8 +60,12 @@ class Robot(object):
         self.status = status
 
     def collide(self, other):
-        if self.status is ZOMBIE and other.status is HUMAN:
-            other.status = ZOMBIE
+        if self.status is Robot.ZOMBIE and other.status is Robot.HUMAN:
+            other.status = Robot.ZOMBIE
+            rospy.loginfo('zombie bit a human')
+
+    def distance_to(self, other):
+        return math.sqrt((self.getX() - other.getX())**2 + (self.getY() - other.getY())**2)
 
     def getX(self):
         return self.location.x
