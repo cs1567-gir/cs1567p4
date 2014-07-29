@@ -11,9 +11,10 @@ import math
 NORTH_WALL = 3.42
 SOUTH_WALL = -2.07
 EAST_WALL = 1.28
-WEST_WALL = -1.99
+#WEST_WALL = -1.99
+WEST_WALL = -1.50
 
-WALL_SAFE_DISTANCE = 1.0
+WALL_SAFE_DISTANCE = 1.5
 
 # coordinates the robots, handles state transitions 
 class Commander(object):

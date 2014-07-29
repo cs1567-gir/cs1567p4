@@ -48,7 +48,7 @@ class RobotTest(object):
 
     def act(self,potential):
         twist = Twist()
-        twist.linear.x = .15
+        twist.linear.x = .2
         epsilon = 1E-3
 
         wanted_angle = math.atan2(potential[1], potential[0])
@@ -64,8 +64,8 @@ class RobotTest(object):
         print 'diff_angle: {}'.format(diff_angle)
 
         if math.fabs(diff_angle) > epsilon:
-            twist.linear.x *= (math.fabs(diff_angle - math.pi) / math.pi)
-            twist.angular.z = 0.5 * (diff_angle / math.pi)
+            #twist.linear.x *= math.fabs((diff_angle - math.pi) / math.pi)
+            twist.angular.z = 0.7 * (diff_angle / math.pi)
             
         self.const_cmd(twist)
 
