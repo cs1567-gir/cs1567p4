@@ -8,6 +8,13 @@ from cs1567p4.srv import *
 import numpy
 import math
 
+NORTH_WALL = 3.42
+SOUTH_WALL = -2.07
+EAST_WALL = 1.28
+WEST_WALL = -1.99
+
+WALL_SAFE_DISTANCE = 1.0
+
 # coordinates the robots, handles state transitions 
 class Commander(object):
     def __init__(self):
@@ -27,6 +34,9 @@ class Commander(object):
         potentials = []
         for other_robot in self.robots:
             potentials.append(robot.get_potential(other_robot))
+
+        # apply wall forces
+        potentials.extend(robot.get_wall_potential())
 
         # take list of 2-element tuples and add them
         potential = reduce(lambda x, y: (x[0]+y[0], x[1]+y[1]), potentials)
@@ -88,6 +98,19 @@ class Robot(object):
         if self.status == other.status:
             pass                                #Consider scaling down the effect of like-robots
         return (force_vector[0], force_vector[1])
+
+    def get_wall_potential(self):
+        #returns a list of force vectors acting on the robot from each of the four walls
+        wallForces = []
+        if self.getY() >= NORTH_WALL - WALL_SAFE_DISTANCE:
+            wallForces.append((0, -1/((NORTH_WALL - self.getY())**2)))
+        if self.getY() <= SOUTH_WALL + WALL_SAFE_DISTANCE:
+            wallForces.append((0, 1/((SOUTH_WALL - self.getY())**2)))
+        if self.getX() >= EAST_WALL - WALL_SAFE_DISTANCE:
+            wallForces.append((-1/((EAST_WALL - self.getX())**2), 0))
+        if self.getX() <= WEST_WALL + WALL_SAFE_DISTANCE:
+            wallForces.append((1/((WEST_WALL - self.getX())**2), 0))
+        return wallForces
 
 if __name__ == "__main__":
     try:
