@@ -64,7 +64,7 @@ class RobotTest(object):
         print 'diff_angle: {}'.format(diff_angle)
 
         if math.fabs(diff_angle) > epsilon:
-            #twist.linear.x *= math.fabs((diff_angle - math.pi) / math.pi)
+            twist.linear.x *= (math.pi - math.fabs(diff_angle)) / math.pi
             twist.angular.z = 0.7 * (diff_angle / math.pi)
             
         self.const_cmd(twist)

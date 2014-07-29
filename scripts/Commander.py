@@ -56,10 +56,22 @@ class Commander(object):
         
         # handle bump
 
+    def show_statuses(self):
+        for i in xrange(len(self.robots)):
+            robot = self.robots[i] 
+            msg = 'id: {} status: '.format(i)
+            if robot.status is Robot.ZOMBIE:
+                msg += 'ZOMBIE'
+            else:
+                msg += 'HUMAN'
+            print msg
+        print ''
+
     def cache_locations(self, msg):
         for location in msg.robots:
             # store the location in the robot object
             self.robots[location.robot_num].location = location
+        self.show_statuses()
 
 # holds data about a robot
 class Robot(object):
@@ -103,14 +115,10 @@ class Robot(object):
     def get_wall_potential(self):
         #returns a list of force vectors acting on the robot from each of the four walls
         wallForces = []
-        if self.getY() >= NORTH_WALL - WALL_SAFE_DISTANCE:
-            wallForces.append((0, -1/((NORTH_WALL - self.getY())**2)))
-        if self.getY() <= SOUTH_WALL + WALL_SAFE_DISTANCE:
-            wallForces.append((0, 1/((SOUTH_WALL - self.getY())**2)))
-        if self.getX() >= EAST_WALL - WALL_SAFE_DISTANCE:
-            wallForces.append((-1/((EAST_WALL - self.getX())**2), 0))
-        if self.getX() <= WEST_WALL + WALL_SAFE_DISTANCE:
-            wallForces.append((1/((WEST_WALL - self.getX())**2), 0))
+        wallForces.append((0, -2/((NORTH_WALL - self.getY())**2)))
+        wallForces.append((0, 2/((SOUTH_WALL - self.getY())**2)))
+        wallForces.append((-2/((EAST_WALL - self.getX())**2), 0))
+        wallForces.append((2/((WEST_WALL - self.getX())**2), 0))
         return wallForces
 
 if __name__ == "__main__":
