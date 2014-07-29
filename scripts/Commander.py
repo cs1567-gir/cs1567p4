@@ -51,7 +51,7 @@ class Commander(object):
         other = reduce(lambda x, y: x if robot.distance_to(x) < robot.distance_to(y) else y, 
                        filter(lambda x: x is not robot, self.robots))
 
-        if other is not None:
+        if other is not None and robot.distance_to(other) <= 0.7:
             robot.collide(other)
         
         # handle bump
